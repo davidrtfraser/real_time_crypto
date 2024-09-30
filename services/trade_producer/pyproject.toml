@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "src"
+name = "trade_producer"
 version = "0.1.0"
 description = ""
 authors = ["davidrtfraser <david.rt.fraser@gmail.com>"]
@@ -11,6 +11,7 @@ quixstreams = "^2.11.1"
 loguru = "^0.7.2"
 websocket-client = "^1.8.0"
 pydantic = "^2.9.2"
+pydantic-settings = "^2.5.2"
 
 
 [build-system]
