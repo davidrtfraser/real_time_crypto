@@ -33,7 +33,7 @@ class KrakenWebsocketAPI:
         self._ws = create_connection(self.URL)
         logger.debug(f"Connection Established")
 
-        # Subscribe to the given trades for the given product_id
+        # Subscribe to the given trades for the given product_id(S)
         self._subscribe(product_id)
 
     def get_trades(self)->List[Trade]:
