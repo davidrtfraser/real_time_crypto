@@ -2,6 +2,7 @@ name: redpanda-quickstart-one-broker
 networks:
   redpanda_network:
     driver: bridge
+    name: redpanda_network # We specify this name to make it easier to reference the network in other files.
 volumes:
   redpanda-0: null
 services:
