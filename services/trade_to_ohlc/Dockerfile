@@ -17,4 +17,4 @@ ENV PYTHONPATH=/app
 RUN poetry install
 
 # Run the application
-CMD ["poetry", "run", "python", "src/trade_to_ohlc.py"]
+CMD ["poetry", "run", "python", "src/main.py"]
