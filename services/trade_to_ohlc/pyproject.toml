@@ -6,7 +6,7 @@ authors = ["davidrtfraser <david.rt.fraser@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 loguru = "^0.7.2"
 quixstreams = "^2.11.1"
 pydantic-settings = "^2.5.2"
