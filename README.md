@@ -14,7 +14,7 @@ HINT: you will need to update:
  - the Kraken Websocket API class
 
 - [X] Trade to ohlc service
-- [ ] Homework: Dockerize the trade to OHLC service
+- [X] Homework: Dockerize the trade to OHLC service
 HINT: you need to extract config parameters and dockerize the trade_to_ohlc service
 
 
