@@ -13,6 +13,7 @@ def init_ohlcv_candel(trade: dict):
         'low': trade['price'],
         'close': trade['price'],
         'volume': trade['quantity'],
+        'product_id': trade['product_id'],
         #'timestamp_ms': trade['timestamp_ms'],
     }
 
@@ -81,9 +82,10 @@ def transform_trade_to_ohlcv(
     sdf["close"] = sdf["value"]["close"]
     sdf["volume"] = sdf["value"]["volume"]
     sdf["timestamp_ms"] = sdf["end"]
+    sdf["product_id"] = sdf["value"]["product_id"]
 
     #Keep only the columns we need
-    sdf = sdf[["open", "high", "low", "close", "volume", "timestamp_ms"]]
+    sdf = sdf[["product_id","timestamp_ms", "open", "high", "low", "close", "volume"]]
 
     # Print the output to the console
     sdf.update(logger.debug)
