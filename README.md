@@ -17,7 +17,7 @@ HINT: you will need to update:
 - [X] Homework: Dockerize the trade to OHLC service
 HINT: you need to extract config parameters and dockerize the trade_to_ohlc service
 
-
+- [X] Topic to feature store service -> service only reads data from kafka I.e. consumer
 
 ## Session 3 
-- [] 
+- [ ] 

@@ -27,6 +27,7 @@ def update_ohlvc_candel(candle: dict, trade: dict):
     candle['close'] = trade['price']
     candle['volume'] += trade['quantity']
     #candle['timestamp_ms'] = trade['timestamp_ms']
+    candle['product_id'] = trade['product_id']
 
     return candle
 
