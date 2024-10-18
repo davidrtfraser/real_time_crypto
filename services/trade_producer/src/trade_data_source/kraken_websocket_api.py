@@ -2,18 +2,21 @@ from typing import List
 from datetime import datetime, timezone
 from websocket import create_connection
 from loguru import logger
-from pydantic import BaseModel
 import json
+from src.trade_data_source.trade import Trade
+from src.trade_data_source.base import TradeSource
 
-class Trade(BaseModel):
-    # We use pydantic to validate the data; this is a dataclass from pydantic
-    # BaseModel is a data class that we inherit from
-    product_id: str
-    quantity: float
-    price: float
-    timestamp_ms: int
 
-class KrakenWebsocketAPI:
+# from pydantic import BaseModel
+# class Trade(BaseModel):
+#     # We use pydantic to validate the data; this is a dataclass from pydantic
+#     # BaseModel is a data class that we inherit from
+#     product_id: str
+#     quantity: float
+#     price: float
+#     timestamp_ms: int
+
+class KrakenWebsocketAPI(TradeSource):
     """
     Class for reading data from Kraken Websocket API
     """

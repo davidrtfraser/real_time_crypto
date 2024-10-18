@@ -1,21 +1,23 @@
 from typing import List
 from quixstreams import Application
 from loguru import logger
-from src.kraken_websocket_api import KrakenWebsocketAPI, Trade
+# from services.trade_producer.src.trade_data_source.kraken_websocket_api import KrakenWebsocketAPI, Trade
 from src.config import config
+from src.trade_data_source.trade import Trade
+from src.trade_data_source.base import TradeSource
 
 
 def produce_trades(
     kafka_broker_address: str,
     kafka_topic: str,
-    product_id: str,
+    trade_data_source: TradeSource,
 ):
     """
     Reads trades from the Kraken WEbsocket API and produces them to a Kafka topic.
     Args:
         kafka_broker_address (str): The address of the Kafka broker.
         kafka_topic (str): The name of the Kafka topic to save the trades.
-        product_id (str): The product ID to get the trades from.
+        trade_data_source (TradeSource): The source of the trade data.
     Returns:
         None
     """
@@ -25,14 +27,12 @@ def produce_trades(
     # Define the Kafka topic with JSON serialization
     topic = app.topic(name=kafka_topic, value_serializer='json')
 
-    # Create a Kraken API object
-    kraken_api = KrakenWebsocketAPI(product_id=product_id)
-
     # Create a producer (helps save data to the topic)
     with app.get_producer() as producer:
-        while True:
-            # We use type annotation when we define the variable
-            trades: List[Trade] = kraken_api.get_trades()
+        while not trade_data_source.is_done():
+        # while trade_data_source.is_done() is False:
+
+            trades: List[Trade] = trade_data_source.get_trades()
 
             # Serialize the event using the defined topic
             # Transform the event into a sequence of bytes
@@ -49,11 +49,12 @@ def produce_trades(
 
 
 if __name__ == '__main__':
+    from src.trade_data_source.kraken_websocket_api import KrakenWebsocketAPI
+    kraken_api = KrakenWebsocketAPI(product_id=config.product_id)
 
-    
     produce_trades(
         kafka_broker_address = config.kafka_broker_address,
         kafka_topic = config.kafka_topic,
-        product_id = config.product_id,
+        trade_data_source = kraken_api,
     )
 
