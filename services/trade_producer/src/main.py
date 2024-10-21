@@ -1,7 +1,6 @@
 from typing import List
 from quixstreams import Application
 from loguru import logger
-# from services.trade_producer.src.trade_data_source.kraken_websocket_api import KrakenWebsocketAPI, Trade
 from src.config import config
 from src.trade_data_source.trade import Trade
 from src.trade_data_source.base import TradeSource
@@ -49,8 +48,18 @@ def produce_trades(
 
 
 if __name__ == '__main__':
-    from src.trade_data_source.kraken_websocket_api import KrakenWebsocketAPI
-    kraken_api = KrakenWebsocketAPI(product_id=config.product_id)
+
+    if config.live_or_historical == 'live':
+        from src.trade_data_source.kraken_websocket_api import KrakenWebsocketAPI
+        kraken_api = KrakenWebsocketAPI(product_id=config.product_id)
+    elif config.live_or_historical == 'historical':
+        from src.trade_data_source.kraken_rest_api import KrakenRestAPI
+        kraken_api = KrakenRestAPI(
+            product_id=config.product_id,
+            last_n_days=config.last_n_days,
+            )
+    else:
+        raise ValueError("Invalid value for live_or_historical")
 
     produce_trades(
         kafka_broker_address = config.kafka_broker_address,
