@@ -2,6 +2,7 @@ from quixstreams import Application
 from datetime import timedelta
 from loguru import logger
 from src.config import config
+from typing import Any, List, Optional, Tuple
 
 def init_ohlcv_candel(trade: dict):
     """
@@ -31,6 +32,18 @@ def update_ohlvc_candel(candle: dict, trade: dict):
 
     return candle
 
+def custom_ts_extractor(
+        value: Any,
+        headers: Optional[List[Tuple[str, bytes]]],
+        timestamp: float,
+        timestamp_type,
+) -> int:
+    """
+    Specify a custom timestamp exrtactor to extract the timestamp from the trade data.
+    Rather than from the Kafka message, we extract the timestamp from the trade data itself.
+    """
+    return value['timestamp_ms']
+
 def transform_trade_to_ohlcv(
         kafka_broker_address: str,
         kafka_input_topic: str,
@@ -56,7 +69,7 @@ def transform_trade_to_ohlcv(
                       consumer_group=kafka_consumer_group)
 
     # Define the Kafka topic with JSON serialization
-    input_topic = app.topic(name=kafka_input_topic, value_serializer='json')
+    input_topic = app.topic(name=kafka_input_topic, value_serializer='json', timestamp_extractor=custom_ts_extractor)
     output_topic = app.topic(name=kafka_output_topic, value_serializer='json')
 
     # Create a Quix Steam Dataframe

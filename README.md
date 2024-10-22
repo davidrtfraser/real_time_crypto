@@ -20,4 +20,7 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
 - [X] Topic to feature store service -> service only reads data from kafka I.e. consumer
 
 ## Session 3 
-- [ ] 
+- [ ] Start the backfill of historical data
+    - [X] implement a Kraken historical data reader (trade producer)
+    - [X] Adjust timestamps used to buckert trades into windows (trade to ohlc)
+    - [ ] Save historical OHLCV features to batches in the offline store (topic_to_feature_store)
