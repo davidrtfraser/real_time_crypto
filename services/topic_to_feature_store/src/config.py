@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Optional
 
 class AppConfig(BaseSettings):
     kafka_broker_address: str
@@ -10,6 +10,7 @@ class AppConfig(BaseSettings):
     feature_group_primary_keys: List[str]
     feature_group_event_time: str
     start_offline_materialization: bool
+    batch_size: Optional[int] = 1 # Here we set the default value to 1
 
     class Config:
         env_file = ".env"

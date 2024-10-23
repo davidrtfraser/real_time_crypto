@@ -13,8 +13,8 @@ project = hopsworks.login(
 feature_store = project.get_feature_store()
 
 # Push the message to the feature store
-def push_value_to_feature_group(
-    value: dict,
+def push_value_to_feature_group( 
+    value: List[dict],
     feature_group_name: str,
     feature_group_version: int,
     feature_group_primary_keys: List[str],
@@ -25,7 +25,7 @@ def push_value_to_feature_group(
     Pushes a value to a feature_group_name in the Feature store.
 
     Args:
-        value (dict): The value to push to the feature group.
+        value List(dict): The value to push to the feature group.
         feature_group_name (str): The name of the feature group.
         feature_group_version (int): The version of the feature group.
         feature_group_primary_keys (List[str]): The primary key of the feature group.
@@ -48,7 +48,9 @@ def push_value_to_feature_group(
     )
 
     # Transform the value into a pandas DataFrame
-    value_df = pd.DataFrame([value])
+    value_df = pd.DataFrame(value)
 
     # Push the value to the feature store; offline store for large amounts of data; online store for real-time data and fast access
-    feature_group.insert(value_df, write_options={"start_offline_materialization":False}) # Do not materialize the data immediately we want it only in the online store
+    feature_group.insert(value_df, 
+                         write_options={"start_offline_materialization":start_offline_materialization}
+                         ) # Do not materialize the data immediately we want it only in the online store

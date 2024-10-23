@@ -4,7 +4,7 @@ from loguru import logger
 from src.config import config
 from typing import Any, List, Optional, Tuple
 
-def init_ohlcv_candel(trade: dict):
+def init_ohlcv_candle(trade: dict):
     """
     Returns the initial state of the OHLCV candle.
     """
@@ -18,7 +18,7 @@ def init_ohlcv_candel(trade: dict):
         #'timestamp_ms': trade['timestamp_ms'],
     }
 
-def update_ohlvc_candel(candle: dict, trade: dict):
+def update_ohlvc_candle(candle: dict, trade: dict):
     """
     Updates the OHLCV candle with the new trade data.
     """
@@ -66,7 +66,11 @@ def transform_trade_to_ohlcv(
     # Create an application with Kafka configuration
     app = Application(broker_address=kafka_broker_address,
                       # We need to set the consumer group to read the data from the topic
-                      consumer_group=kafka_consumer_group)
+                      consumer_group=kafka_consumer_group,
+                      # auto_offset_reset="latest" # this line is not in the original code
+                      )
+    
+    app.clear_state() # Clear the state of the application
 
     # Define the Kafka topic with JSON serialization
     input_topic = app.topic(name=kafka_input_topic, value_serializer='json', timestamp_extractor=custom_ts_extractor)
@@ -81,13 +85,13 @@ def transform_trade_to_ohlcv(
     # Aggregates trades into OHLCV candles
     sdf = (
         sdf.tumbling_window(duration_ms=timedelta(seconds=ohlcv_window_seconds))
-        .reduce(reducer=update_ohlvc_candel, initializer=init_ohlcv_candel)
+        .reduce(reducer=update_ohlvc_candle, initializer=init_ohlcv_candle)
         # .current() # would be used if we wanted to get the current state of the window
         .final() # is used to get the final state of the window (we wait for the window to close)
     )
 
     # Print the output to the console
-    sdf.update(logger.debug)
+    # sdf.update(logger.debug)
 
     # Unpack the dictionary to separate columns
     sdf["open"] = sdf["value"]["open"]
