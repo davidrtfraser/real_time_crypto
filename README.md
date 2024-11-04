@@ -24,3 +24,11 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
     - [X] implement a Kraken historical data reader (trade producer)
     - [X] Adjust timestamps used to buckert trades into windows (trade to ohlc)
     - [X] Save historical OHLCV features to batches in the offline store (topic_to_feature_store)
+
+## Session 4
+- [X] Dockerize our real-time feature pipeline
+- [ ] Dockerize our backfill pipline and run it-> Generate training data
+- [ ] Start building our training pipeline
+    - [ ] Build a class to read OHLC data from the feature store
+    - [ ] Build a simple baseline model
+    - [ ] Integrate our training pipeline with Comet ML (experiment tracking and logging)

@@ -1,5 +1,5 @@
 # Lets start with a python version 3.11
-FROM python:3.11.10-slim
+FROM python:3.11.10
 
 # Set the working directory to /app
 WORKDIR /app

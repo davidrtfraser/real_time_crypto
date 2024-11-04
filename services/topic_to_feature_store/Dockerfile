@@ -4,7 +4,13 @@ FROM python:3.11.10
 # Set the working directory
 WORKDIR /app
 
-# Install python poetry with verion 1.8.3
+# Install build-essential which includes gcc and other tools
+RUN apt-get update && apt-get install -y --fix-missing build-essential
+
+# Clear the APT cache again
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install python poetry with version 1.8.3
 RUN pip install poetry==1.8.3
 
 # Copy the source code to the working directory
