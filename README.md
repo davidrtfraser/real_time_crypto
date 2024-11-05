@@ -27,7 +27,7 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
 
 ## Session 4
 - [X] Dockerize our real-time feature pipeline
-- [ ] Dockerize our backfill pipline and run it-> Generate training data
+- [X] Dockerize our backfill pipline and run it-> Generate training data
 - [ ] Start building our training pipeline
     - [ ] Build a class to read OHLC data from the feature store
     - [ ] Build a simple baseline model
