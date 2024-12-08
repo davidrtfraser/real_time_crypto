@@ -42,7 +42,7 @@ def push_value_to_feature_group(
         version=feature_group_version,
         primary_key=feature_group_primary_keys,
         event_time=feature_group_event_time,
-        online_enabled=True, # Store historical data and enable online feature serving
+        online_enabled=start_offline_materialization, # Store historical data and enable online feature serving
         #expectation_suite=expectation_suite_transactions # This lets us validate the data; really useful for data quality monitoring
         # this checks the content of the data and raises an error if the data does not match the schema
     )
