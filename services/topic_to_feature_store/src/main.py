@@ -83,6 +83,13 @@ def topic_to_feature_store (
             # Clear the batch
             batch  = []
 
+            # Store the offset of the processed message on the Consumer 
+            # for the auto-commit mechanism.
+            # It will send it to Kafka in the background.
+            # Storing offset only after the message is processed enables at-least-once delivery
+            # guarantees.
+            consumer.store_offsets(message=msg)
+
 if __name__ == "__main__":
     topic_to_feature_store (
         kafka_broker_address = config.kafka_broker_address,

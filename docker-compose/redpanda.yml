@@ -8,8 +8,7 @@ volumes:
 services:
   redpanda-0:
     command:
-      - redpanda
-      - start
+      - redpanda start
       - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
       # Address the broker advertises to clients that connect to the Kafka API.
       # Use the internal addresses to connect to the Redpanda brokers'

@@ -5,7 +5,7 @@ networks:
 services:
   trade_producer:
     build:
-      context: ..//services/trade_producer
+      context: ../services/trade_producer
       dockerfile: Dockerfile
     networks:
       - redpanda_network
@@ -14,7 +14,7 @@ services:
       
   trade_to_ohlc:
     build:
-      context: ..//services/trade_to_ohlc
+      context: ../services/trade_to_ohlc
       dockerfile: Dockerfile
     networks:
       - redpanda_network
@@ -23,7 +23,7 @@ services:
 
   topic_to_feature_store:
     build:
-      context: ..//services/topic_to_feature_store
+      context: ../services/topic_to_feature_store
       dockerfile: Dockerfile
     networks:
       - redpanda_network
