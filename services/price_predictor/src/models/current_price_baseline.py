@@ -17,7 +17,7 @@ class CurrentPriceBaseline:
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """
-        Predicts the next price using the current price.
+        Predicts the next price as the current price.
 
         Args:
             data (pd.DataFrame): _description_

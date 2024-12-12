@@ -14,7 +14,7 @@ HINT: you will need to update:
  - the Kraken Websocket API class
 
 - [X] Trade to ohlc service
-- [X] Homework: Dockerize the trade to OHLC service
+- [X] HOMEWORK: Dockerize the trade to OHLC service
 HINT: you need to extract config parameters and dockerize the trade_to_ohlc service
 
 - [X] Topic to feature store service -> service only reads data from kafka I.e. consumer
@@ -30,5 +30,9 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
 - [X] Dockerize our backfill pipline and run it-> Generate training data
 - [X] Start building our training pipeline
     - [X] Build a class to read OHLC data from the feature store
-    - [ ] Build a simple baseline model to predict price into the future
-    - [ ] Integrate our training pipeline with Comet ML (experiment tracking and logging)
+    - [X] Build a simple baseline model to predict price into the future
+    - [ ] HOMEWORK: implement moving_average_baseline model to predict price into the future
+## Session 5
+    - [X] Integrate our training pipeline with Comet ML (experiment tracking and logging)
+    - [ ] Feature Engineering
+    - [ ] Build XGBoost model
