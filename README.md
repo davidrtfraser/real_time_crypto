@@ -35,4 +35,4 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
 ## Session 5
     - [X] Integrate our training pipeline with Comet ML (experiment tracking and logging)
     - [ ] Feature Engineering
-    - [ ] Build XGBoost model
+    - [X] Build XGBoost/LightGBM/Catboost (categorical data) model
