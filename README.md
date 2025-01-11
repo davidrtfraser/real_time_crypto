@@ -34,5 +34,5 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
     - [ ] HOMEWORK: implement moving_average_baseline model to predict price into the future
 ## Session 5
     - [X] Integrate our training pipeline with Comet ML (experiment tracking and logging)
-    - [ ] Feature Engineering
+    - [X] Feature Engineering
     - [X] Build XGBoost/LightGBM/Catboost (categorical data) model

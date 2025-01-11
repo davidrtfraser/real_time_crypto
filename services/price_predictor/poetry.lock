@@ -2122,6 +2122,20 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
+name = "ta-lib"
+version = "0.6.0"
+description = "Python wrapper for TA-Lib"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ta_lib-0.6.0.tar.gz", hash = "sha256:b66f3bcdc4a787731d0aa82af72f60d74aa0d1705d0e702da3b1cf48343e7e90"},
+]
+
+[package.dependencies]
+numpy = "*"
+setuptools = "*"
+
+[[package]]
 name = "threadpoolctl"
 version = "3.5.0"
 description = "threadpoolctl"
@@ -2350,4 +2364,4 @@ scikit-learn = ["scikit-learn"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "db4a65ac49ef66a087fdc50937d35fde48c8dea6d5cf441260899a29653376b2"
+content-hash = "9bfd4cce821ccf8208ac2cca7f9185c38270fd2bfffabc773bd4460d0ba73740"

@@ -6,6 +6,7 @@ from src.models.current_price_baseline import CurrentPriceBaseline
 from sklearn.metrics import mean_absolute_error 
 from comet_ml import Experiment
 from xgboost import XGBRegressor
+from src.feature_engineering import add_technical_indicators
 
 def train_model(
     comet_config: CometConfig,
@@ -106,12 +107,46 @@ def train_model(
     X_train = X_train[['open', 'high', 'low', 'close', 'volume']]
     X_test = X_test[['open', 'high', 'low', 'close', 'volume']]
 
+    # Add technical indicators
+    X_train = add_technical_indicators(X_train)
+    X_test = add_technical_indicators(X_test)
+    logger.debug(f"Added technical indicators to the training and test sets")
+    logger.debug(f"X_train columns after adding technical indicators: {X_train.columns}")
+    logger.debug(f"X_test columns after adding technical indicators: {X_test.columns}")
+    experiment.log_parameter("features", X_train.columns.tolist())
+
+    # Extract row indices for X_Train where any of the technical indicators are NaN
+    nan_rows_train = X_train.isna().any(axis=1)
+
+    # Count number of rows with NaN values
+    logger.debug(f"Number of rows with NaN values in the training set: {nan_rows_train.sum()}")
+
+    # Drop rows with NaN values
+    X_train = X_train.loc[~nan_rows_train]
+    y_train = y_train.loc[~nan_rows_train]
+    
+    # Extract row indices for X_Test where any of the technical indicators are NaN
+    nan_rows_test = X_test.isna().any(axis=1)
+
+    # Count number of rows with NaN values
+    logger.debug(f"Number of rows with NaN values in the test set: {nan_rows_test.sum()}")
+
+    # Drop rows with NaN values
+    X_test = X_test.loc[~nan_rows_test]
+    y_test = y_test.loc[~nan_rows_test]
+
+    experiment.log_parameter("n_nan_rows_train", nan_rows_train.sum())
+    experiment.log_parameter("n_nan_rows_test", nan_rows_test.sum())
+    experiment.log_parameter("perc_drop_nan_rows_train", nan_rows_train.sum() / X_train.shape[0] * 100)
+    experiment.log_parameter("perc_drop_nan_rows_test", nan_rows_test.sum() / X_test.shape[0] * 100)
+
     # Log the dimensions of the training and test sets
     logger.debug(f"X_train shape: {X_train.shape}")
     logger.debug(f"y_train shape: {y_train.shape}")
     logger.debug(f"X_test shape: {X_test.shape}")
     logger.debug(f"y_test shape: {y_test.shape}")
 
+    # Add the shapes to the Comet experiment
     experiment.log_parameter("X_train_shape", X_train.shape)
     experiment.log_parameter("y_train_shape", y_train.shape)
     experiment.log_parameter("X_test_shape", X_test.shape)
