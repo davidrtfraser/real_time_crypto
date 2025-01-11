@@ -5,6 +5,7 @@ from loguru import logger
 from src.models.current_price_baseline import CurrentPriceBaseline
 from sklearn.metrics import mean_absolute_error 
 from comet_ml import Experiment
+from xgboost import XGBRegressor
 
 def train_model(
     comet_config: CometConfig,
@@ -92,13 +93,18 @@ def train_model(
     logger.debug(f"Test set shape afer NAN: {test_df.shape}")
     experiment.log_parameter("n_train_rows_after_dropna_shape", train_df.shape)
     experiment.log_parameter("n_test_rows_after_dropna_shape", test_df.shape)
-
+    
     # split the data into features and target
     X_train = train_df.drop(columns=['target_price'])       
     y_train = train_df['target_price']
     X_test = test_df.drop(columns=['target_price'])
     y_test = test_df['target_price']
     logger.debug(f"Split the data into features and target")
+
+    # Keep only the features we want to use
+    # To do: think if we want to keep these hardcoded or make them configurable
+    X_train = X_train[['open', 'high', 'low', 'close', 'volume']]
+    X_test = X_test[['open', 'high', 'low', 'close', 'volume']]
 
     # Log the dimensions of the training and test sets
     logger.debug(f"X_train shape: {X_train.shape}")
@@ -118,13 +124,29 @@ def train_model(
 
     # Evaluate the model
     y_pred = model.predict(X_test)
+    
 
     # Compute the mean absolute error
+    mae = mean_absolute_error(y_test, y_pred)
+    logger.debug(f"Mean absolute error of current price baseline: {mae}")
+    experiment.log_metric("mean_absolute_error_current_price_baseline", mae)
+
+    # Compute the mae on the training set for debugging purposes
+    y_pred_train = model.predict(X_train)
+    mae_train = mean_absolute_error(y_train, y_pred_train)
+    logger.debug(f"Mean absolute error on the training set CurrentPriceBaseline: {mae_train}")
+    experiment.log_metric("mean_absolute_error_current_price_baseline_train", mae_train)
+
+    # Train an xgboost model
+    model = XGBRegressor() # We are using the default hyperparameters
+    xgb_model = model.fit(X_train, y_train)
+    y_pred = xgb_model.predict(X_test)
     mae = mean_absolute_error(y_test, y_pred)
     logger.debug(f"Mean absolute error: {mae}")
     experiment.log_metric("mean_absolute_error", mae)
     
     # Save the model to the model registry
+    # To do: implement this
     experiment.end()
 
 if __name__ == "__main__":
