@@ -5,8 +5,9 @@ from loguru import logger
 from src.models.current_price_baseline import CurrentPriceBaseline
 from sklearn.metrics import mean_absolute_error 
 from comet_ml import Experiment
-from xgboost import XGBRegressor
 from src.feature_engineering import add_technical_indicators
+from src.models.xgboost_model import XGBoostModel
+from src.utils import hash_data
 
 def train_model(
     comet_config: CometConfig,
@@ -20,6 +21,8 @@ def train_model(
     last_n_days: int, # The number of days of data to train on
     forecast_steps: int, # The number of steps to forecast (minutes)
     perc_test_data: Optional[float] = 0.23, # The percentage of data to use for testing
+    n_search_trials: Optional[int] = 10, # The number of search trials for hyperparameter tuning
+    n_splits: Optional[int] = 3, # The number of splits for cross-validation
 
 ):
     """
@@ -39,6 +42,8 @@ def train_model(
         last_n_days (int): The number of days of data to train on
         forecast_steps (int): The number of steps to forecast (minutes)
         perc_test_data (float): The percentage of data to use for testing
+        n_search_trials (int): The number of search trials for hyperparameter tuning
+        n_splits (int): The number of splits for cross-validation
 
     Returns:
         None
@@ -49,6 +54,11 @@ def train_model(
         project_name=comet_config.comet_project_name,
     )
 
+    # Log the parameters
+    experiment.log_parameter("last_n_days", last_n_days)
+    experiment.log_parameter("forecast_steps", forecast_steps)
+    experiment.log_parameter("n_search_trials", n_search_trials)
+    experiment.log_parameter("n_splits", n_splits)
 
     # Read features from the feature store
     ohlc_data_reader = OhlcDataReader(
@@ -67,6 +77,10 @@ def train_model(
     )
     logger.debug(f"Read {len(ohlc_data)} rows data from the feature store")
     experiment.log_parameter("num_raw_feature_rows", len(ohlc_data))
+
+    # Log a hash of the data to comet; this is useful to check if the data has changed
+    dataset_hash = hash_data(ohlc_data)
+    experiment.log_parameter("ohlc_data_hash", dataset_hash) # We could use this method as a native comet method
 
     # Split the data into training and test sets; we need a time-based split
     # Our Data is already sorted by timestamp_ms
@@ -159,7 +173,6 @@ def train_model(
 
     # Evaluate the model
     y_pred = model.predict(X_test)
-    
 
     # Compute the mean absolute error
     mae = mean_absolute_error(y_test, y_pred)
@@ -173,8 +186,8 @@ def train_model(
     experiment.log_metric("mean_absolute_error_current_price_baseline_train", mae_train)
 
     # Train an xgboost model
-    model = XGBRegressor() # We are using the default hyperparameters
-    xgb_model = model.fit(X_train, y_train)
+    xgb_model = XGBoostModel()
+    xgb_model.fit(X_train, y_train, n_search_trials=n_search_trials, n_splits=n_splits)
     y_pred = xgb_model.predict(X_test)
     mae = mean_absolute_error(y_test, y_pred)
     logger.debug(f"Mean absolute error: {mae}")
@@ -195,5 +208,7 @@ if __name__ == "__main__":
                 product_id=config.product_id,
                 last_n_days=config.last_n_days,
                 forecast_steps=config.forecast_steps,
+                n_search_trials=config.n_search_trials,
+                n_splits=config.n_splits
 
     )
