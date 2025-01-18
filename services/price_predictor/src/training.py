@@ -181,6 +181,7 @@ def train_model(
     mae = mean_absolute_error(y_test, y_pred)
     logger.debug(f"Mean absolute error of current price baseline: {mae}")
     experiment.log_metric("mean_absolute_error_current_price_baseline", mae)
+    mae_baseline = mae
 
     # Compute the mae on the training set for debugging purposes
     y_pred_train = model.predict(X_train)
@@ -210,12 +211,16 @@ def train_model(
                          overwrite=True
     )
     
-    # Register the model in the model registry
-    registered_model = experiment.register_model(
-        model_name=model_name
-    )
-
-    logger.info(f"Model registered in commet ML {model_name} (version:{model_version})")
+    # We don't want to register the model if the mae is higher than the baseline
+    if mae < mae_baseline:
+        logger.info(f"Mean absolute error of the model is lower than the baseline. Registering the model")
+        # Register the model in the model registry
+        registered_model = experiment.register_model(
+            model_name=model_name
+        )
+        logger.info(f"Model registered in commet ML {model_name} (version:{model_version})")
+    else:
+        logger.info(f"Mean absolute error of the model is higher than the baseline. Not registering the model")
     experiment.end()
 
     # Clean up the local model file
