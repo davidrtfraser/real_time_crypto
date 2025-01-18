@@ -8,6 +8,9 @@ from comet_ml import Experiment
 from src.feature_engineering import add_technical_indicators
 from src.models.xgboost_model import XGBoostModel
 from src.utils import hash_data
+import joblib
+import os
+
 
 def train_model(
     comet_config: CometConfig,
@@ -193,9 +196,30 @@ def train_model(
     logger.debug(f"Mean absolute error: {mae}")
     experiment.log_metric("mean_absolute_error", mae)
     
-    # Save the model to the model registry
-    # To do: implement this
+    # Save the model to the model commet ml registry
+    model_name = f"price_predictor_{product_id.replace('/','_')}_{ohlc_window_sec}sec_{forecast_steps}steps"
+    model_version=f"{forecast_steps} step forecast"
+
+    # Save the model locally
+    local_model_path = f"{model_name}.joblib"
+    joblib.dump(xgb_model.get_model_object(), local_model_path)
+
+    # Log the model to the Comet experiment
+    experiment.log_model(name=model_name, 
+                         file_or_folder=local_model_path, 
+                         overwrite=True
+    )
+    
+    # Register the model in the model registry
+    registered_model = experiment.register_model(
+        model_name=model_name
+    )
+
+    logger.info(f"Model registered in commet ML {model_name} (version:{model_version})")
     experiment.end()
+
+    # Clean up the local model file
+    os.remove(local_model_path)
 
 if __name__ == "__main__":
     train_model(comet_config=comet_config,

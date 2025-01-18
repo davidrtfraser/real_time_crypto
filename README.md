@@ -39,7 +39,7 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
 
 # Session 6
     - [X] Fix overfitting problem with k-fold cross validation of hyperparameters
-    - [] Push model artifact to the model registry
+    - [X] Push model artifact to the model registry
     - [] Dockerize the training service
 
 

@@ -113,3 +113,7 @@ class XGBoostModel:
 
     def predict(self, X_test):
         return self.model.predict(X_test)
+    
+    def get_model_object(self):
+        return self.model
+    
