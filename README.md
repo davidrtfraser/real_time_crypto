@@ -38,7 +38,7 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
     - [X] Build XGBoost/LightGBM/Catboost (categorical data) model
 
 # Session 6
-    - [] Fix overfitting problem with k-fold cross validation of hyperparameters
+    - [X] Fix overfitting problem with k-fold cross validation of hyperparameters
     - [] Push model artifact to the model registry
     - [] Dockerize the training service
 
