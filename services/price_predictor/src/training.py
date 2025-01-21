@@ -10,6 +10,7 @@ from src.models.xgboost_model import XGBoostModel
 from src.utils import hash_data
 import joblib
 import os
+from src.feature_engineering import add_temporal_features
 
 
 def train_model(
@@ -131,6 +132,15 @@ def train_model(
     logger.debug(f"X_train columns after adding technical indicators: {X_train.columns}")
     logger.debug(f"X_test columns after adding technical indicators: {X_test.columns}")
     experiment.log_parameter("features", X_train.columns.tolist())
+
+    # Add temporal features from the timestamp_ms column
+    X_train =  add_temporal_features(X_train)
+    X_test = add_temporal_features(X_test)
+    logger.debug(f"Added temporal features to the training and test sets")
+    logger.debug(f"X_train columns after adding temporal features: {X_train.columns}")
+    logger.debug(f"X_test columns after adding temporal features: {X_test.columns}")
+    experiment.log_parameter("features", X_train.columns.tolist())
+    experiment.log_parameter("n_features", len(X_train.columns))
 
     # Extract row indices for X_Train where any of the technical indicators are NaN
     nan_rows_train = X_train.isna().any(axis=1)

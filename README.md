@@ -33,15 +33,23 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
     - [X] Build a simple baseline model to predict price into the future
     - [ ] HOMEWORK: implement moving_average_baseline model to predict price into the future
 ## Session 5
-    - [X] Integrate our training pipeline with Comet ML (experiment tracking and logging)
-    - [X] Feature Engineering
-    - [X] Build XGBoost/LightGBM/Catboost (categorical data) model
+- [X] Integrate our training pipeline with Comet ML (experiment tracking and logging)
+- [X] Feature Engineering
+- [X] Build XGBoost/LightGBM/Catboost (categorical data) model
 
-# Session 6
-    - [X] Fix overfitting problem with k-fold cross validation of hyperparameters
-    - [X] Push model artifact to the model registry
-    - [X] Dockerize the training service
-    - [] Engineer temporal features
+## Session 6
+- [X] Fix overfitting problem with k-fold cross validation of hyperparameters
+- [X] Push model artifact to the model registry
+- [X] Dockerize the training service
+
+## Session 7
+- [X] Improve model by adding more features and re-train
+    - [X] Engineer temporal features
+    - [] Add more technical indicators (we focus on momentum)
+- [] Start building inference pipeline
+    - [] Predictor object/service
+    - [] Streaming app
+    - [] REST API to serve
 
 
 

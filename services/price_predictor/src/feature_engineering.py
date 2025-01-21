@@ -92,3 +92,26 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df['CMF'] = talib.ADOSC(df['high'], df['low'], df['close'], df['volume'], fastperiod=3, slowperiod=10)
 
     return df
+
+def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add temporal features to the dataframe
+
+    Args:
+        df (pd.DataFrame): The input dataframe is expected to have the following columns:
+        - timestamp_ms
+
+    Returns:
+        df (pd.DataFrame): The ouptut dataframe will have the original features and the new temporal features:
+        - timestamp_ms
+        - 'hour'
+        - 'day'
+        - 'month'
+        - 'weekday'
+    """
+    df['hour'] = pd.to_datetime(df['timestamp_ms'], unit='ms').dt.hour
+    df['day'] = pd.to_datetime(df['timestamp_ms'], unit='ms').dt.day
+    df['month'] = pd.to_datetime(df['timestamp_ms'], unit='ms').dt.month
+    df['weekday'] = pd.to_datetime(df['timestamp_ms'], unit='ms').dt.weekday
+
+    return df
