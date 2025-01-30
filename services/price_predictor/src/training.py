@@ -5,12 +5,11 @@ from loguru import logger
 from src.models.current_price_baseline import CurrentPriceBaseline
 from sklearn.metrics import mean_absolute_error 
 from comet_ml import Experiment
-from src.feature_engineering import add_technical_indicators
 from src.models.xgboost_model import XGBoostModel
 from src.utils import hash_data
 import joblib
 import os
-from src.feature_engineering import add_temporal_features
+from src.feature_engineering import add_engineered_features
 
 
 def train_model(
@@ -90,8 +89,8 @@ def train_model(
     # Our Data is already sorted by timestamp_ms
     logger.debug(f"Splitting data into training and test sets")
     test_size = int(perc_test_data * len(ohlc_data))
-    train_df = ohlc_data.iloc[:-test_size]
-    test_df = ohlc_data.iloc[-test_size:]
+    train_df = ohlc_data.iloc[:-test_size].copy(deep=True)
+    test_df = ohlc_data.iloc[-test_size:].copy(deep=True)
     logger.debug(f"Training set shape: {train_df.shape}")
     logger.debug(f"Test set shape: {test_df.shape}")
     experiment.log_parameter("n_train_rows_before_dropna_shape", train_df.shape)
@@ -114,31 +113,23 @@ def train_model(
     experiment.log_parameter("n_test_rows_after_dropna_shape", test_df.shape)
     
     # split the data into features and target
-    X_train = train_df.drop(columns=['target_price'])       
+    X_train = train_df.drop(columns=['target_price']).copy(deep=True)       
     y_train = train_df['target_price']
-    X_test = test_df.drop(columns=['target_price'])
+    X_test = test_df.drop(columns=['target_price']).copy(deep=True)
     y_test = test_df['target_price']
     logger.debug(f"Split the data into features and target")
 
     # Keep only the features we want to use
     # To do: think if we want to keep these hardcoded or make them configurable
-    X_train = X_train[['open', 'high', 'low', 'close', 'volume']]
-    X_test = X_test[['open', 'high', 'low', 'close', 'volume']]
+    X_train = X_train[['open', 'high', 'low', 'close', 'volume', 'timestamp_ms']]
+    X_test = X_test[['open', 'high', 'low', 'close', 'volume', 'timestamp_ms']]
 
     # Add technical indicators
-    X_train = add_technical_indicators(X_train)
-    X_test = add_technical_indicators(X_test)
+    X_train = add_engineered_features(X_train).copy(deep=True)
+    X_test = add_engineered_features(X_test).copy(deep=True)
     logger.debug(f"Added technical indicators to the training and test sets")
     logger.debug(f"X_train columns after adding technical indicators: {X_train.columns}")
     logger.debug(f"X_test columns after adding technical indicators: {X_test.columns}")
-    experiment.log_parameter("features", X_train.columns.tolist())
-
-    # Add temporal features from the timestamp_ms column
-    X_train =  add_temporal_features(X_train)
-    X_test = add_temporal_features(X_test)
-    logger.debug(f"Added temporal features to the training and test sets")
-    logger.debug(f"X_train columns after adding temporal features: {X_train.columns}")
-    logger.debug(f"X_test columns after adding temporal features: {X_test.columns}")
     experiment.log_parameter("features", X_train.columns.tolist())
     experiment.log_parameter("n_features", len(X_train.columns))
 
