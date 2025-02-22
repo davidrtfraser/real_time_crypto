@@ -15,3 +15,9 @@ start-backfill-pipeline:
 
 stop-backfill-pipeline:
 	docker compose -f backfill_pipeline.yml down
+
+reset-docker:
+	docker volume prune
+	docker container prune
+	docker image prune
+	docker network prune

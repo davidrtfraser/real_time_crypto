@@ -69,8 +69,10 @@ def transform_trade_to_ohlcv(
                       consumer_group=kafka_consumer_group,
                       # auto_offset_reset="latest" # this line is not in the original code
                       )
-    
-    app.clear_state() # Clear the state of the application
+    try:
+        app.clear_state() # Clear the state of the application
+    except (FileNotFoundError):
+        pass
 
     # Define the Kafka topic with JSON serialization
     input_topic = app.topic(name=kafka_input_topic, value_serializer='json', timestamp_extractor=custom_ts_extractor)

@@ -45,7 +45,7 @@ HINT: you need to extract config parameters and dockerize the trade_to_ohlc serv
 ## Session 7
 - [X] Improve model by adding more features and re-train
     - [X] Engineer temporal features
-    - [] Add more technical indicators (we focus on momentum)
+    - [X] Add more technical indicators (we focus on momentum)
 - [] Start building inference pipeline
     - [] Predictor object/service
     - [] Streaming app

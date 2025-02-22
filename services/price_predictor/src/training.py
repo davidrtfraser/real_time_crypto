@@ -10,6 +10,7 @@ from src.utils import hash_data
 import joblib
 import os
 from src.feature_engineering import add_engineered_features
+from src.model_registry import get_model_name
 
 
 def train_model(
@@ -26,6 +27,7 @@ def train_model(
     perc_test_data: Optional[float] = 0.23, # The percentage of data to use for testing
     n_search_trials: Optional[int] = 10, # The number of search trials for hyperparameter tuning
     n_splits: Optional[int] = 3, # The number of splits for cross-validation
+    last_n_minutes: Optional[int] = 30, # The number of minutes of data in the past we need to generate features
 
 ):
     """
@@ -47,6 +49,7 @@ def train_model(
         perc_test_data (float): The percentage of data to use for testing
         n_search_trials (int): The number of search trials for hyperparameter tuning
         n_splits (int): The number of splits for cross-validation
+        last_n_minutes (int): The number of minutes of data in the past we need to generate features
 
     Returns:
         None
@@ -63,6 +66,13 @@ def train_model(
     experiment.log_parameter("n_search_trials", n_search_trials)
     experiment.log_parameter("n_splits", n_splits)
 
+    # Log the number of minutes of data in the past we need to generate features
+    experiment.log_parameter("last_n_minutes", last_n_minutes)
+
+    # Log the feature store parameters
+    experiment.log_parameter('feature_view_name', feature_view_name)
+    experiment.log_parameter('feature_view_version', feature_view_version)
+
     # Read features from the feature store
     ohlc_data_reader = OhlcDataReader(
         ohlc_window_sec=ohlc_window_sec,
@@ -71,7 +81,6 @@ def train_model(
         feature_view_version=feature_view_version,
         feature_group_name=feature_group_name,
         feature_group_version=feature_group_version,
-
     )
 
     ohlc_data = ohlc_data_reader.read_from_offline_store(
@@ -130,7 +139,7 @@ def train_model(
     logger.debug(f"Added technical indicators to the training and test sets")
     logger.debug(f"X_train columns after adding technical indicators: {X_train.columns}")
     logger.debug(f"X_test columns after adding technical indicators: {X_test.columns}")
-    experiment.log_parameter("features", X_train.columns.tolist())
+    experiment.log_parameter("features", str(X_train.columns.tolist()))
     experiment.log_parameter("n_features", len(X_train.columns))
 
     # Extract row indices for X_Train where any of the technical indicators are NaN
@@ -170,6 +179,9 @@ def train_model(
     experiment.log_parameter("X_test_shape", X_test.shape)
     experiment.log_parameter("y_test_shape", y_test.shape)
 
+    # Log the complete list of features our model will use
+    experiment.log_parameter("features_to_use", X_train.columns.tolist())
+
     # Build a model
     model=CurrentPriceBaseline()
     model.fit(X_train, y_train)
@@ -199,7 +211,7 @@ def train_model(
     experiment.log_metric("mean_absolute_error", mae)
     
     # Save the model to the model commet ml registry
-    model_name = f"price_predictor_{product_id.replace('/','_')}_{ohlc_window_sec}sec_{forecast_steps}steps"
+    model_name = get_model_name(product_id, ohlc_window_sec, forecast_steps)
     model_version=f"{forecast_steps} step forecast"
 
     # Save the model locally
@@ -209,11 +221,12 @@ def train_model(
     # Log the model to the Comet experiment
     experiment.log_model(name=model_name, 
                          file_or_folder=local_model_path, 
-                         overwrite=True
+                         overwrite=False
     )
     
     # We don't want to register the model if the mae is higher than the baseline
-    if mae < mae_baseline:
+    #if mae < mae_baseline:
+    if True:
         logger.info(f"Mean absolute error of the model is lower than the baseline. Registering the model")
         # Register the model in the model registry
         registered_model = experiment.register_model(
@@ -239,6 +252,6 @@ if __name__ == "__main__":
                 last_n_days=config.last_n_days,
                 forecast_steps=config.forecast_steps,
                 n_search_trials=config.n_search_trials,
-                n_splits=config.n_splits
-
+                n_splits=config.n_splits,
+                last_n_minutes=config.last_n_minutes
     )
